@@ -2,14 +2,17 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import Project from '@/models/Project';
 
+type Params = Promise<{ id: string }>;
+
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Params }
 ) {
   await dbConnect();
   try {
+    const { id } = await context.params;
     const body = await request.json();
-    const project = await Project.findByIdAndUpdate(params.id, body, {
+    const project = await Project.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     });
@@ -22,11 +25,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Params }
 ) {
   await dbConnect();
   try {
-    const project = await Project.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+    const project = await Project.findByIdAndDelete(id);
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     return NextResponse.json({ message: 'Project deleted' });
   } catch (error) {
