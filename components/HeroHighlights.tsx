@@ -15,7 +15,7 @@ export const HeroHighlights = () => {
          </div>
          <div className="relative">
             <h3 className="text-zinc-200 font-bold text-sm md:text-base">Certified Fullstack Dev</h3>
-            <p className="text-zinc-500 text-[10px] md:text-xs uppercase tracking-wider font-mono mt-1.5 font-medium">IITM Pravartak & HCL GUVI</p>
+            <p className="text-zinc-500 text-[10px] md:text-xs uppercase tracking-wider font-mono mt-1.5 font-medium">GUVI (IIT-M Pravartak Incubated)</p>
          </div>
       </div>
 
