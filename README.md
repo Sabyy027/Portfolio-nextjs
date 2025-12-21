@@ -1,33 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Developer Portfolio - Next.js
 
-## Getting Started
+A modern, professional portfolio website built with Next.js 15, TypeScript, Tailwind CSS, and Framer Motion. Features a dark theme with glassmorphism effects, inspired by premium developer portfolios.
 
-First, run the development server:
+## ✨ Features
+
+- **Modern Design**: Clean, dark-themed UI with subtle animations and glassmorphism effects
+- **Fully Responsive**: Optimized for all screen sizes from mobile to desktop
+- **Type-Safe**: Built with TypeScript for robust code quality
+- **Smooth Animations**: Powered by Framer Motion for elegant transitions
+- **Admin Dashboard**: Built-in content management for projects, skills, certificates, and timeline
+- **Local Storage**: Data persists using browser localStorage (easily adaptable to a backend)
+- **SEO Optimized**: Proper meta tags and semantic HTML structure
+
+## 🚀 Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom theme
+- **Animations**: Framer Motion
+- **Icons**: Lucide React + Devicons
+- **Fonts**: Inter & JetBrains Mono (Google Fonts)
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+1. Clone the repository or navigate to the project directory
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Customization
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Update Personal Information
 
-## Learn More
+Edit the `INITIAL_PROFILE` in `types.ts`:
 
-To learn more about Next.js, take a look at the following resources:
+```typescript
+export const INITIAL_PROFILE: UserProfile = {
+  name: "Your Name",
+  role: "Your Role",
+  about: "Your bio",
+  email: "your@email.com",
+  resumeLink: "link-to-resume",
+  githubLink: "https://github.com/yourusername",
+  linkedinLink: "https://linkedin.com/in/yourusername"
+};
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Manage Content
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> **⚠️ IMPORTANT**: Before accessing the admin panel, you must set up your admin password:
+> 1. Copy `.env.example` to `.env.local`
+> 2. Set `NEXT_PUBLIC_ADMIN_PASSWORD` to your desired password
+> 3. Restart the development server
+
+1. Navigate to `/login` and enter your admin password
+2. Access the admin dashboard to add/edit:
+   - Projects
+   - Skills  
+   - Certificates
+   - Learning Timeline
+
+### Theme Customization
+
+Modify colors in `app/globals.css` and Tailwind classes
+
+## 📦 Build for Production
+
+```bash
+npm run build
+npm start
+```
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+---
+
+**Made with ❤️ and Next.js**
 
 ## Deploy on Vercel
 
