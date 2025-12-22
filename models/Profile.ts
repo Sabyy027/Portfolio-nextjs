@@ -8,6 +8,7 @@ const ProfileSchema = new mongoose.Schema({
   resumeLink: { type: String, default: '#' },
   githubLink: { type: String },
   linkedinLink: { type: String },
+  maintenanceMode: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.models.Profile || mongoose.model('Profile', ProfileSchema);

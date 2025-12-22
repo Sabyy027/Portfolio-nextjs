@@ -7,9 +7,9 @@ import { Navbar } from '@/components/Navbar';
 import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/storage';
 import { Project, ProjectCategory, Certificate, LearningNode, UserProfile, INITIAL_PROFILE } from '@/types';
-import { Plus, Trash2, Star, Edit3, Save, X, Globe, Github as GithubIcon, Award, User, BookOpen, Layers } from 'lucide-react';
+import { Plus, Trash2, Star, Edit3, Save, X, Globe, Github as GithubIcon, Award, User, BookOpen, Layers, GripVertical, Settings } from 'lucide-react';
 
-type Tab = 'projects' | 'certifications' | 'learning' | 'profile';
+type Tab = 'projects' | 'certifications' | 'learning' | 'profile' | 'settings';
 
 export default function AdminPage() {
   const { isAuthenticated } = useAuth();
@@ -27,6 +27,10 @@ export default function AdminPage() {
   const [editingCert, setEditingCert] = useState<Certificate | null>(null);
   const [editingNode, setEditingNode] = useState<LearningNode | null>(null);
 
+  // Drag and Drop States
+  const [draggedNodeIndex, setDraggedNodeIndex] = useState<number | null>(null);
+  const [dragOverNodeIndex, setDragOverNodeIndex] = useState<number | null>(null);
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login');
@@ -38,7 +42,8 @@ export default function AdminPage() {
   const fetchAllData = async () => {
     setProjects(await api.getProjects());
     setCertificates(await api.getCertificates());
-    setNodes(await api.getLearningCurve());
+    const learningNodes = await api.getLearningCurve();
+    setNodes(learningNodes.sort((a, b) => (a.order || 0) - (b.order || 0)));
     setProfile(await api.getProfile());
   };
 
@@ -93,7 +98,8 @@ export default function AdminPage() {
     if (!editingNode) return;
     try {
       await api.saveLearningNode(editingNode);
-      setNodes(await api.getLearningCurve());
+      const updatedNodes = await api.getLearningCurve();
+      setNodes(updatedNodes.sort((a, b) => (a.order || 0) - (b.order || 0)));
       setEditingNode(null);
     } catch (err: any) {
       alert(err.message || 'Failed to save timeline event');
@@ -103,18 +109,72 @@ export default function AdminPage() {
     if (confirm('Delete timeline node?')) {
       try {
         await api.deleteLearningNode(id);
-        setNodes(await api.getLearningCurve());
+        const updatedNodes = await api.getLearningCurve();
+        setNodes(updatedNodes.sort((a, b) => (a.order || 0) - (b.order || 0)));
       } catch (err: any) {
         alert(err.message || 'Failed to delete timeline event');
       }
     }
   };
 
+  // --- Drag and Drop Handlers for Learning Curve ---
+  const handleDragStart = (index: number) => {
+    setDraggedNodeIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragOverNodeIndex(index);
+  };
+
+  const handleDrop = async (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedNodeIndex === null || draggedNodeIndex === dropIndex) {
+      setDraggedNodeIndex(null);
+      setDragOverNodeIndex(null);
+      return;
+    }
+
+    // Reorder the nodes array
+    const newNodes = [...nodes];
+    const [draggedNode] = newNodes.splice(draggedNodeIndex, 1);
+    newNodes.splice(dropIndex, 0, draggedNode);
+
+    // Update order values
+    const updatedNodes = newNodes.map((node, idx) => ({
+      ...node,
+      order: idx
+    }));
+
+    setNodes(updatedNodes);
+    setDraggedNodeIndex(null);
+    setDragOverNodeIndex(null);
+
+    // Save all nodes with updated order
+    try {
+      await Promise.all(updatedNodes.map(node => api.saveLearningNode(node)));
+      alert('Timeline order updated successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Failed to save timeline order');
+    }
+  };
+
+  const handleDragEnd = () => {
+    setDraggedNodeIndex(null);
+    setDragOverNodeIndex(null);
+  };
+
   // --- Handlers for Profile ---
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Saving profile with maintenanceMode:', profile.maintenanceMode);
     await api.updateProfile(profile);
-    alert('Profile updated successfully!');
+    // Refresh profile from database to ensure UI reflects saved state
+    const updatedProfile = await api.getProfile();
+    setProfile(updatedProfile);
+    console.log('Profile saved and refreshed. maintenanceMode is now:', updatedProfile.maintenanceMode);
+    alert('Settings saved successfully!');
   };
 
   // --- New Item Generators ---
@@ -165,6 +225,7 @@ export default function AdminPage() {
             { id: 'certifications', label: 'Certifications', icon: Award },
             { id: 'learning', label: 'Learning Curve', icon: BookOpen },
             { id: 'profile', label: 'Profile & About', icon: User },
+            { id: 'settings', label: 'Settings', icon: Settings },
           ].map(tab => (
             <button
               key={tab.id}
@@ -223,16 +284,43 @@ export default function AdminPage() {
         {/* --- LEARNING CURVE TAB --- */}
         {activeTab === 'learning' && (
           <div className="space-y-4">
-            {nodes.map((node) => (
-              <div key={node.id} className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 flex justify-between items-center group">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="font-bold text-lg">{node.title}</h3>
-                    <span className="text-xs font-mono text-zinc-500">{node.date}</span>
-                    <span className="text-[10px] uppercase font-bold text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">{node.category}</span>
+            {nodes.map((node, index) => (
+              <div 
+                key={node.id} 
+                draggable
+                onDragStart={() => handleDragStart(index)}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`bg-zinc-900/50 border rounded-2xl p-6 flex justify-between items-center group cursor-move transition-all ${
+                  draggedNodeIndex === index 
+                    ? 'opacity-50 border-green-500/50' 
+                    : dragOverNodeIndex === index 
+                      ? 'border-green-500 bg-zinc-800/50' 
+                      : 'border-white/5 hover:border-zinc-700'
+                }`}
+              >
+                {/* Drag Handle */}
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="text-zinc-600 hover:text-zinc-400 cursor-grab active:cursor-grabbing">
+                    <GripVertical size={20} />
                   </div>
-                  <p className="text-zinc-400 text-sm max-w-2xl">{node.description}</p>
+                  
+                  {/* Order Number Badge */}
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-400 text-sm font-bold">
+                    {index + 1}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="font-bold text-lg break-words">{node.title}</h3>
+                      <span className="text-xs font-mono text-zinc-500">{node.date}</span>
+                      <span className="text-[10px] uppercase font-bold text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded-full">{node.category}</span>
+                    </div>
+                    <p className="text-zinc-400 text-sm max-w-2xl break-words">{node.description}</p>
+                  </div>
                 </div>
+                
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => setEditingNode(node)} className="p-2 hover:bg-zinc-800 rounded-full text-zinc-400"><Edit3 size={16} /></button>
                   <button onClick={() => handleDeleteNode(node.id)} className="p-2 hover:bg-red-500/10 rounded-full text-zinc-400 hover:text-red-400"><Trash2 size={16} /></button>
@@ -268,7 +356,48 @@ export default function AdminPage() {
                    <input value={profile.linkedinLink} onChange={e => setProfile({...profile, linkedinLink: e.target.value})} className="w-full bg-zinc-950 border border-white/10 rounded-full px-4 py-2" />
                 </div>
               </div>
+              
               <Button type="submit" className="w-full">Save Profile Changes</Button>
+            </form>
+          </div>
+        )}
+
+        {/* --- SETTINGS TAB --- */}
+        {activeTab === 'settings' && (
+          <div className="max-w-2xl mx-auto bg-zinc-900/50 border border-white/5 rounded-3xl p-8">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-zinc-100 mb-2">Site Settings</h2>
+              <p className="text-zinc-400">Manage global site configurations and features</p>
+            </div>
+
+            <form onSubmit={handleSaveProfile} className="space-y-6">
+              {/* Maintenance Mode Toggle */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-6 bg-zinc-950 border border-white/10 rounded-2xl hover:border-zinc-700 transition-colors">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-zinc-100">Maintenance Banner</h3>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${profile.maintenanceMode ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-zinc-700/50 text-zinc-500'}`}>
+                        {profile.maintenanceMode ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-400">
+                      Display "⚠️ Updates in progress - new content coming soon!" banner on homepage
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <input 
+                      type="checkbox" 
+                      checked={profile.maintenanceMode || false} 
+                      onChange={e => setProfile({...profile, maintenanceMode: e.target.checked})} 
+                      className="sr-only peer"
+                    />
+                    <div className="w-14 h-7 bg-zinc-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-500 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+                  </label>
+                </div>
+              </div>
+
+              <Button type="submit" className="w-full">Save Settings</Button>
             </form>
           </div>
         )}
@@ -367,7 +496,7 @@ export default function AdminPage() {
                     <input placeholder="Date / Period" value={editingNode.date} onChange={e => setEditingNode({...editingNode, date: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" required />
                     <input placeholder="Institution / Company" value={editingNode.institution || ''} onChange={e => setEditingNode({...editingNode, institution: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                   </div>
-                  <textarea placeholder="Description" value={editingNode.description} onChange={e => setEditingNode({...editingNode, description: e.target.value})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg h-32" required />
+                  <textarea placeholder="Description" value={editingNode.description} onChange={e => setEditingNode({...editingNode, description: e.target.value})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg h-32 break-words whitespace-pre-wrap" required />
                   <input placeholder="Tags (comma sep)" value={editingNode.tags?.join(', ') || ''} onChange={e => setEditingNode({...editingNode, tags: e.target.value.split(',').map(s=>s.trim())})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                   
                   <div className="flex gap-4">

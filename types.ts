@@ -78,6 +78,7 @@ export interface UserProfile {
   resumeLink: string;
   githubLink?: string;
   linkedinLink?: string;
+  maintenanceMode?: boolean;
 }
 
 export const INITIAL_PROFILE: UserProfile = {
@@ -87,5 +88,6 @@ export const INITIAL_PROFILE: UserProfile = {
   email: "sabeeranwermeeran@gmail.com",
   resumeLink: "https://sabeer-anwer-meeran-resume.tiiny.site/",
   githubLink: "https://github.com/Sabyy027",
-  linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/"
+  linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/",
+  maintenanceMode: false
 };

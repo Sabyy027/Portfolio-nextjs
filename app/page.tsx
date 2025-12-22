@@ -8,6 +8,7 @@ import { Projects } from '@/components/Projects';
 import { LearningCurve } from '@/components/LearningCurve';
 import { Certificates } from '@/components/Certificates';
 import { Contact } from '@/components/Contact';
+import { MaintenanceBanner } from '@/components/MaintenanceBanner';
 import { api } from '@/lib/storage';
 import { UserProfile, INITIAL_PROFILE } from '@/types';
 
@@ -29,6 +30,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+      <MaintenanceBanner />
       <Navbar toggleTheme={toggleTheme} isDark={isDark} />
       <Hero profile={profile} />
       <Skills />

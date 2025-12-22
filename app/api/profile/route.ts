@@ -15,7 +15,8 @@ export async function GET() {
         email: "sabeeranwermeeran@gmail.com",
         resumeLink: "https://sabeer-anwer-meeran-resume.tiiny.site/",
         githubLink: "https://github.com/Sabyy027",
-        linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/"
+        linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/",
+        maintenanceMode: false
       });
     }
     return NextResponse.json(profile);
@@ -28,14 +29,23 @@ export async function POST(request: Request) {
   await dbConnect();
   try {
     const body = await request.json();
+    console.log('Received profile update:', body);
     let profile = await Profile.findOne({});
     if (profile) {
-      profile = await Profile.findByIdAndUpdate(profile._id, body, { new: true });
+      // Use findByIdAndUpdate with runValidators to ensure schema is applied
+      profile = await Profile.findByIdAndUpdate(
+        profile._id, 
+        body, 
+        { new: true, runValidators: true, strict: false }
+      );
+      console.log('Profile updated:', profile);
     } else {
       profile = await Profile.create(body);
+      console.log('Profile created:', profile);
     }
     return NextResponse.json(profile);
   } catch (error) {
+    console.error('Profile update error:', error);
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 400 });
   }
 }
