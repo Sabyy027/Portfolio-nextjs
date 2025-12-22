@@ -9,10 +9,17 @@ export async function PUT(request: Request, context: { params: Params }) {
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const cert = await Certification.findByIdAndUpdate(id, body, { new: true });
+    console.log('Updating certification with data:', body);
+    const cert = await Certification.findByIdAndUpdate(
+      id, 
+      body, 
+      { new: true, runValidators: true, strict: false }
+    );
+    console.log('Updated certification:', cert);
     if (!cert) return NextResponse.json({ error: 'Certification not found' }, { status: 404 });
     return NextResponse.json(cert);
   } catch (error) {
+    console.error('Certification update error:', error);
     return NextResponse.json({ error: 'Failed to update certification' }, { status: 500 });
   }
 }

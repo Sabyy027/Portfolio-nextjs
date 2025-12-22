@@ -37,17 +37,46 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const href = getNavHref(item);
               const isExternal = item.name === 'Projects' || item.name === 'Certificates';
               
-              return isExternal ? (
-                <Link key={item.name} href={href} className="text-sm font-medium text-zinc-400 hover:text-white px-4 py-2 rounded-full hover:bg-white/5 transition-all">
+              if (isExternal) {
+                return (
+                  <Link key={item.name} href={item.href} className="text-sm font-medium text-zinc-400 hover:text-white px-4 py-2 rounded-full hover:bg-white/5 transition-all">
+                    {item.name}
+                  </Link>
+                );
+              }
+              
+              // For anchor links (About, Journey), use smooth scroll without URL change
+              const handleClick = (e: React.MouseEvent) => {
+                e.preventDefault();
+                const sectionId = item.href.split('#')[1];
+                
+                // If not on homepage, navigate there first
+                if (pathname !== '/') {
+                  window.location.href = '/' + (sectionId ? `#${sectionId}` : '');
+                  return;
+                }
+                
+                // Scroll to section on homepage
+                if (sectionId) {
+                  setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 100);
+                }
+              };
+              
+              return (
+                <button 
+                  key={item.name} 
+                  onClick={handleClick}
+                  className="text-sm font-medium text-zinc-400 hover:text-white px-4 py-2 rounded-full hover:bg-white/5 transition-all"
+                >
                   {item.name}
-                </Link>
-              ) : (
-                <a key={item.name} href={href} className="text-sm font-medium text-zinc-400 hover:text-white px-4 py-2 rounded-full hover:bg-white/5 transition-all">
-                  {item.name}
-                </a>
+                </button>
               );
             })}
           </div>
@@ -81,30 +110,55 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
         <div className={`absolute top-16 right-4 left-4 bg-zinc-900 border border-white/10 rounded-2xl p-4 shadow-2xl transition-transform duration-300 ${mobileMenuOpen ? 'translate-y-0' : '-translate-y-4'}`}>
           <div className="flex flex-col gap-1">
             {navItems.map((item) => {
-              const href = getNavHref(item);
               const isExternal = item.name === 'Projects' || item.name === 'Certificates';
               const Icon = item.icon;
               
-              return isExternal ? (
-                <Link 
+              if (isExternal) {
+                return (
+                  <Link 
+                    key={item.name} 
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 text-zinc-300 hover:text-white px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all"
+                  >
+                    <Icon size={18} />
+                    <span className="font-medium text-sm">{item.name}</span>
+                  </Link>
+                );
+              }
+              
+              // For anchor links, use smooth scroll without URL change
+              const handleClick = () => {
+                const sectionId = item.href.split('#')[1];
+                
+                // If not on homepage, navigate there first
+                if (pathname !== '/') {
+                  window.location.href = '/' + (sectionId ? `#${sectionId}` : '');
+                  setMobileMenuOpen(false);
+                  return;
+                }
+                
+                // Scroll to section on homepage
+                if (sectionId) {
+                  setTimeout(() => {
+                    const element = document.getElementById(sectionId);
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                  }, 100);
+                }
+                setMobileMenuOpen(false);
+              };
+              
+              return (
+                <button 
                   key={item.name} 
-                  href={href}
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={handleClick}
                   className="flex items-center gap-3 text-zinc-300 hover:text-white px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all"
                 >
                   <Icon size={18} />
                   <span className="font-medium text-sm">{item.name}</span>
-                </Link>
-              ) : (
-                <a 
-                  key={item.name} 
-                  href={href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 text-zinc-300 hover:text-white px-3 py-2.5 rounded-xl hover:bg-white/5 transition-all"
-                >
-                  <Icon size={18} />
-                  <span className="font-medium text-sm">{item.name}</span>
-                </a>
+                </button>
               );
             })}
           </div>

@@ -12,26 +12,51 @@ export const Certificates = () => {
     const [certificates, setCertificates] = useState<Certificate[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const [initialDelayComplete, setInitialDelayComplete] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         const fetchCerts = async () => {
             const fetched = await api.getCertificates();
+            console.log('Fetched certificates:', fetched);
             const featured = fetched.filter(c => c.isFeatured);
             if(featured.length > 0) {
-                setCertificates(featured.sort((a, b) => a.order - b.order));
+                // Sort by priority (highest first), then by order
+                const sorted = featured.sort((a, b) => {
+                    const priorityA = a.priority || 0;
+                    const priorityB = b.priority || 0;
+                    console.log(`Comparing: ${a.name} (priority: ${priorityA}) vs ${b.name} (priority: ${priorityB})`);
+                    if (priorityB !== priorityA) {
+                        return priorityB - priorityA; // Higher priority first
+                    }
+                    return a.order - b.order; // Then by order
+                });
+                console.log('Sorted certificates:', sorted.map(c => ({ name: c.name, priority: c.priority || 0, order: c.order })));
+                setCertificates(sorted);
             }
         };
         fetchCerts();
     }, []);
 
+    // Initial 15-second delay for highest priority certificate
     useEffect(() => {
-        if (isPaused || certificates.length < 2) return;
+        if (certificates.length === 0) return;
+        
+        const timer = setTimeout(() => {
+            setInitialDelayComplete(true);
+        }, 15000); // 15 seconds
+        
+        return () => clearTimeout(timer);
+    }, [certificates.length]);
+
+    // Auto-rotation after initial delay
+    useEffect(() => {
+        if (!initialDelayComplete || isPaused || certificates.length < 2) return;
         const interval = setInterval(() => {
             setActiveIndex((prev) => (prev + 1) % certificates.length);
         }, 4000);
         return () => clearInterval(interval);
-    }, [isPaused, certificates.length]);
+    }, [initialDelayComplete, isPaused, certificates.length]);
 
     if (certificates.length === 0) return null;
 

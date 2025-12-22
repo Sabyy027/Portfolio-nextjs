@@ -58,6 +58,7 @@ export interface Certificate {
   imageUrl: string;
   credentialLink?: string;
   isFeatured: boolean;
+  priority?: number; // Higher number = higher priority (0-10)
   order: number;
 }
 

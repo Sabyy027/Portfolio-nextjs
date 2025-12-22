@@ -7,6 +7,7 @@ const CertificationSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   credentialLink: { type: String },
   isFeatured: { type: Boolean, default: false },
+  priority: { type: Number, default: 0, min: 0, max: 10 },
   order: { type: Number, default: 0 }
 }, { timestamps: true });
 

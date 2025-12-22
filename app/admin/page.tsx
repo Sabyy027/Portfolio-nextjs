@@ -74,6 +74,7 @@ export default function AdminPage() {
     e.preventDefault();
     if (!editingCert) return;
     try {
+      console.log('Saving certificate with data:', editingCert);
       await api.saveCertificate(editingCert);
       setCertificates(await api.getCertificates());
       setEditingCert(null);
@@ -187,7 +188,7 @@ export default function AdminPage() {
   const newCert = () => setEditingCert({
     id: '', name: '', issuer: '', date: new Date().getFullYear().toString(), 
     imageUrl: 'https://picsum.photos/100/100?random=' + Math.random(), 
-    credentialLink: '', isFeatured: false, order: 0
+    credentialLink: '', isFeatured: false, priority: 0, order: 0
   });
 
   const newNode = () => setEditingNode({
@@ -460,6 +461,23 @@ export default function AdminPage() {
                    <input placeholder="Link" value={editingCert.credentialLink} onChange={e => setEditingCert({...editingCert, credentialLink: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                  </div>
                  <input placeholder="Image URL" value={editingCert.imageUrl} onChange={e => setEditingCert({...editingCert, imageUrl: e.target.value})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg" required />
+                 
+                 {/* Priority Slider */}
+                 <div className="space-y-2">
+                   <label className="flex items-center justify-between text-sm text-zinc-400">
+                     <span>Priority / Weightage</span>
+                     <span className="text-zinc-200 font-bold">{editingCert.priority || 0}/10</span>
+                   </label>
+                   <input 
+                     type="range" 
+                     min="0" 
+                     max="10" 
+                     value={editingCert.priority || 0} 
+                     onChange={e => setEditingCert({...editingCert, priority: parseInt(e.target.value)})}
+                     className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-green-500"
+                   />
+                   <p className="text-xs text-zinc-500">Higher priority certificates appear first in the carousel (shown for 15 seconds)</p>
+                 </div>
                  
                  <div className="flex gap-4">
                     <label className="flex items-center gap-2 cursor-pointer">
