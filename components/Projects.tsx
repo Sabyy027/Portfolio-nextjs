@@ -10,12 +10,20 @@ import { ArrowUpRight, Github, X, CheckCircle2 } from 'lucide-react';
 // --- Projects with Modal ---
 
 const ProjectModal = ({ project, onClose }: { project: Project, onClose: () => void }) => {
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
       onClick={onClose}
     >
       <motion.div 
@@ -23,7 +31,7 @@ const ProjectModal = ({ project, onClose }: { project: Project, onClose: () => v
         animate={{ y: 0, scale: 1 }}
         exit={{ y: 50, scale: 0.95 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-zinc-900 border border-zinc-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl relative"
+        className="bg-zinc-900 border border-zinc-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl relative my-8"
       >
         <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/80 transition-colors z-10"><X size={20} /></button>
         
@@ -40,7 +48,7 @@ const ProjectModal = ({ project, onClose }: { project: Project, onClose: () => v
           <div className="md:col-span-2 space-y-6">
             <div>
               <h3 className="text-xl font-bold text-white mb-3">About the Project</h3>
-              <p className="text-zinc-400 leading-relaxed">
+              <p className="text-zinc-400 leading-relaxed text-justify">
                 {project.longDescription || project.description}
               </p>
             </div>
@@ -102,6 +110,12 @@ export const Projects = ({ featuredOnly = false }: { featuredOnly?: boolean }) =
       if (featuredOnly) {
          filtered = filtered.filter(p => p.isFeatured);
       }
+      // Sort by order (ascending), then by creation date
+      filtered.sort((a, b) => {
+        const orderA = a.order ?? 999;
+        const orderB = b.order ?? 999;
+        return orderA - orderB;
+      });
       setProjects(filtered); 
     };
     fetchProjects();

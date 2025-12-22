@@ -23,6 +23,7 @@ export interface Project {
   projectType?: string;
   isPublished: boolean;
   isFeatured: boolean;
+  order?: number;
   longDescription?: string;
   features?: string[];
 }

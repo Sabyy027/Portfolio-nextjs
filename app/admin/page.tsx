@@ -182,7 +182,7 @@ export default function AdminPage() {
   const newProject = () => setEditingProject({
     id: '', title: '', description: '', techStack: [], 
     imageUrl: 'https://picsum.photos/600/400?random=' + Math.random(), 
-    category: ProjectCategory.Personal, projectType: 'Full Stack Web App', isPublished: true, isFeatured: false 
+    category: ProjectCategory.Personal, projectType: 'Full Stack Web App', isPublished: true, isFeatured: false, order: 0
   });
   
   const newCert = () => setEditingCert({
@@ -432,6 +432,19 @@ export default function AdminPage() {
                       <option value="Personal">Personal</option>
                       <option value="Mini">Mini</option>
                     </select>
+                 </div>
+                 
+                 {/* Order Number */}
+                 <div className="space-y-2">
+                   <label className="text-sm text-zinc-400">Display Order (lower numbers appear first)</label>
+                   <input 
+                     type="number" 
+                     placeholder="Order (e.g., 1, 2, 3...)" 
+                     value={editingProject.order || 0} 
+                     onChange={e => setEditingProject({...editingProject, order: parseInt(e.target.value) || 0})} 
+                     className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg" 
+                     min="0"
+                   />
                  </div>
                  
                  <div className="flex gap-4">
