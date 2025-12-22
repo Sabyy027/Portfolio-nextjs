@@ -15,6 +15,7 @@ const ProjectSchema = new mongoose.Schema({
   projectType: { type: String, default: 'Web App' },
   isPublished: { type: Boolean, default: true },
   isFeatured: { type: Boolean, default: false },
+  isOngoing: { type: Boolean, default: false },
   order: { type: Number, default: 0 },
   longDescription: { type: String },
   features: [{ type: String }],

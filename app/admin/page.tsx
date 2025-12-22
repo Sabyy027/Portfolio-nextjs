@@ -182,7 +182,7 @@ export default function AdminPage() {
   const newProject = () => setEditingProject({
     id: '', title: '', description: '', techStack: [], 
     imageUrl: 'https://picsum.photos/600/400?random=' + Math.random(), 
-    category: ProjectCategory.Personal, projectType: 'Full Stack Web App', isPublished: true, isFeatured: false, order: 0
+    category: ProjectCategory.Personal, projectType: 'Full Stack Web App', isPublished: true, isFeatured: false, isOngoing: false, order: 0
   });
   
   const newCert = () => setEditingCert({
@@ -450,6 +450,7 @@ export default function AdminPage() {
                  <div className="flex gap-4">
                    <label className="flex items-center gap-2"><input type="checkbox" checked={editingProject.isFeatured} onChange={e => setEditingProject({...editingProject, isFeatured: e.target.checked})} /> Featured</label>
                    <label className="flex items-center gap-2"><input type="checkbox" checked={editingProject.isPublished} onChange={e => setEditingProject({...editingProject, isPublished: e.target.checked})} /> Published</label>
+                   <label className="flex items-center gap-2"><input type="checkbox" checked={editingProject.isOngoing} onChange={e => setEditingProject({...editingProject, isOngoing: e.target.checked})} /> Ongoing</label>
                  </div>
 
                  <div className="flex gap-4 mt-6">

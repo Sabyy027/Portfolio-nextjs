@@ -138,6 +138,15 @@ export default function ProjectsPage() {
         <div className="flex justify-between items-start mb-6">
           <span className="text-[10px] uppercase tracking-wider font-bold text-green-400 bg-green-400/10 border border-green-400/20 px-3 py-1 rounded-full">{project.projectType || project.category}</span>
           <div className="flex gap-2">
+            {project.isOngoing && (
+              <div className="relative">
+                <span className="text-[10px] uppercase tracking-wider font-bold text-amber-400 bg-amber-400/10 border border-amber-400/30 px-3 py-1 rounded-full flex items-center gap-1.5 animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping absolute"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  Ongoing
+                </span>
+              </div>
+            )}
              {project.repoLink && (
                <a href={project.repoLink} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="p-2.5 bg-zinc-800/50 hover:bg-white hover:text-black rounded-full transition-colors text-zinc-400 z-30">
                  <Github size={18} />
