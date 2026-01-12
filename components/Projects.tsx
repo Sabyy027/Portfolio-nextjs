@@ -86,10 +86,24 @@ const ProjectModal = ({ project, onClose }: { project: Project, onClose: () => v
                    Live Demo <ArrowUpRight size={18} />
                  </a>
                )}
-               {project.repoLink && (
-                 <a href={project.repoLink} target="_blank" rel="noreferrer" className="w-full py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
-                   View Code <Github size={18} />
-                 </a>
+               {/* Repo Links */}
+               {project.backendRepo ? (
+                 <div className="flex gap-3">
+                   {project.repoLink && (
+                    <a href={project.repoLink} target="_blank" rel="noreferrer" className="flex-1 py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                      Frontend <Github size={18} />
+                    </a>
+                   )}
+                   <a href={project.backendRepo} target="_blank" rel="noreferrer" className="flex-1 py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                      Backend <Github size={18} />
+                   </a>
+                 </div>
+               ) : (
+                 project.repoLink && (
+                   <a href={project.repoLink} target="_blank" rel="noreferrer" className="w-full py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                     View Code <Github size={18} />
+                   </a>
+                 )
                )}
              </div>
           </div>

@@ -27,7 +27,7 @@ export const HeroHighlights = () => {
          </div>
          <div className="relative">
             <h3 className="text-zinc-200 font-bold text-sm md:text-base">B.Tech CSE</h3>
-            <p className="text-zinc-500 text-[10px] md:text-xs uppercase tracking-wider font-mono mt-1.5 font-medium">Graduate</p>
+            <p className="text-zinc-500 text-[10px] md:text-xs uppercase tracking-wider font-mono mt-1.5 font-medium">Graduate 2025</p>
          </div>
       </div>
 

@@ -86,10 +86,24 @@ const ProjectModal = ({ project, onClose }: { project: Project, onClose: () => v
                    Live Demo <ArrowUpRight size={18} />
                  </a>
                )}
-               {project.repoLink && (
-                 <a href={project.repoLink} target="_blank" rel="noreferrer" className="w-full py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
-                   View Code <Github size={18} />
-                 </a>
+               {/* Repo Links */}
+               {project.backendRepo ? (
+                 <div className="flex gap-3">
+                   {project.repoLink && (
+                    <a href={project.repoLink} target="_blank" rel="noreferrer" className="flex-1 py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                      Frontend <Github size={18} />
+                    </a>
+                   )}
+                   <a href={project.backendRepo} target="_blank" rel="noreferrer" className="flex-1 py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                      Backend <Github size={18} />
+                   </a>
+                 </div>
+               ) : (
+                 project.repoLink && (
+                   <a href={project.repoLink} target="_blank" rel="noreferrer" className="w-full py-3 bg-zinc-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+                     View Code <Github size={18} />
+                   </a>
+                 )
                )}
              </div>
           </div>
@@ -103,27 +117,33 @@ export default function ProjectsPage() {
   const [profile, setProfile] = useState<UserProfile>(INITIAL_PROFILE);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      setProfile(await api.getProfile());
-      const allProjects = await api.getProjects();
-      const published = allProjects.filter(p => p.isPublished);
-      // Sort by order (ascending)
-      published.sort((a, b) => {
-        const orderA = a.order ?? 999;
-        const orderB = b.order ?? 999;
-        return orderA - orderB;
-      });
-      setProjects(published);
+      try {
+        setProfile(await api.getProfile());
+        const allProjects = await api.getProjects();
+        const published = allProjects.filter(p => p.isPublished);
+        // Sort by order (ascending)
+        published.sort((a, b) => {
+          const orderA = a.order ?? 999;
+          const orderB = b.order ?? 999;
+          return orderA - orderB;
+        });
+        setProjects(published);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
 
   const featuredProjects = projects.filter(p => p.isFeatured || p.category === ProjectCategory.Featured);
+  const ongoingProjects = projects.filter(p => !p.isFeatured && p.category === ProjectCategory.Ongoing);
   const personalProjects = projects.filter(p => !p.isFeatured && p.category === ProjectCategory.Personal);
   const miniProjects = projects.filter(p => !p.isFeatured && p.category === ProjectCategory.Mini);
-  const otherProjects = projects.filter(p => !p.isFeatured && !['Featured', 'Personal', 'Mini'].includes(p.category));
+  const otherProjects = projects.filter(p => !p.isFeatured && !['Featured', 'Personal', 'Mini', 'Ongoing'].includes(p.category));
 
   const ProjectCard = ({ project }: { project: Project }) => (
     <motion.div 
@@ -180,56 +200,106 @@ export default function ProjectsPage() {
            <p className="text-zinc-400 max-w-2xl mx-auto">Explore my journey through code, from major feature implementations to experimental mini-tools.</p>
         </div>
 
-        {/* Featured Section */}
-        {featuredProjects.length > 0 && (
-          <section>
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-white">Featured Projects</h2>
-              <div className="h-[1px] bg-zinc-800 flex-1"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
-          </section>
-        )}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+             {[1, 2, 3, 4, 5, 6].map(i => (
+               <div key={i} className="bg-zinc-900/40 border border-white/5 rounded-3xl overflow-hidden h-96 flex flex-col animate-pulse">
+                 <div className="p-8 pb-0 flex-1 space-y-4">
+                   <div className="flex justify-between">
+                     <div className="h-6 w-20 bg-zinc-800 rounded-full"></div>
+                     <div className="flex gap-2">
+                       <div className="h-8 w-8 bg-zinc-800 rounded-full"></div>
+                       <div className="h-8 w-8 bg-zinc-800 rounded-full"></div>
+                     </div>
+                   </div>
+                   <div className="h-8 w-3/4 bg-zinc-800 rounded"></div>
+                   <div className="space-y-2">
+                     <div className="h-4 w-full bg-zinc-800 rounded"></div>
+                     <div className="h-4 w-5/6 bg-zinc-800 rounded"></div>
+                   </div>
+                   <div className="flex gap-2 pt-4">
+                      <div className="h-6 w-16 bg-zinc-800 rounded"></div>
+                      <div className="h-6 w-16 bg-zinc-800 rounded"></div>
+                      <div className="h-6 w-16 bg-zinc-800 rounded"></div>
+                   </div>
+                 </div>
+                 <div className="h-32 bg-zinc-800 w-full mt-auto"></div>
+               </div>
+             ))}
+          </div>
+        ) : (
+          <>
+            {/* Featured Section */}
+            {featuredProjects.length > 0 && (
+              <section>
+                <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-3xl font-bold text-white">Featured Projects</h2>
+                  <div className="h-[1px] bg-zinc-800 flex-1"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {featuredProjects.map(p => <ProjectCard key={p.id} project={p} />)}
+                </div>
+              </section>
+            )}
 
-        {/* Personal Projects Section */}
-        {personalProjects.length > 0 && (
-          <section>
-             <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-white">Personal Projects</h2>
-              <div className="h-[1px] bg-zinc-800 flex-1"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {personalProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
-          </section>
-        )}
+            {/* Ongoing Projects Section */}
+            {ongoingProjects.length > 0 && (
+              <section>
+                 <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                    Currently Building
+                    <span className="relative flex h-3 w-3">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                  </h2>
+                  <div className="h-[1px] bg-zinc-800 flex-1"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {ongoingProjects.map(p => <ProjectCard key={p.id} project={p} />)}
+                </div>
+              </section>
+            )}
 
-        {/* Mini Projects Section */}
-        {miniProjects.length > 0 && (
-          <section>
-             <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-white">Mini Projects</h2>
-              <div className="h-[1px] bg-zinc-800 flex-1"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {miniProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
-          </section>
-        )}
+            {/* Personal Projects Section */}
+            {personalProjects.length > 0 && (
+              <section>
+                 <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-3xl font-bold text-white">Personal Projects</h2>
+                  <div className="h-[1px] bg-zinc-800 flex-1"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {personalProjects.map(p => <ProjectCard key={p.id} project={p} />)}
+                </div>
+              </section>
+            )}
 
-        {/* Other Projects Section (Fallback) */}
-        {otherProjects.length > 0 && (
-          <section>
-             <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-white">Other Explorations</h2>
-              <div className="h-[1px] bg-zinc-800 flex-1"></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {otherProjects.map(p => <ProjectCard key={p.id} project={p} />)}
-            </div>
-          </section>
+            {/* Mini Projects Section */}
+            {miniProjects.length > 0 && (
+              <section>
+                 <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-3xl font-bold text-white">Mini Projects</h2>
+                  <div className="h-[1px] bg-zinc-800 flex-1"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {miniProjects.map(p => <ProjectCard key={p.id} project={p} />)}
+                </div>
+              </section>
+            )}
+
+            {/* Other Projects Section (Fallback) */}
+            {otherProjects.length > 0 && (
+              <section>
+                 <div className="flex items-center gap-4 mb-8">
+                  <h2 className="text-3xl font-bold text-white">Other Explorations</h2>
+                  <div className="h-[1px] bg-zinc-800 flex-1"></div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {otherProjects.map(p => <ProjectCard key={p.id} project={p} />)}
+                </div>
+              </section>
+            )}
+          </>
         )}
       </div>
 

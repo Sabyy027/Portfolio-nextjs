@@ -11,12 +11,17 @@ import { useRouter } from 'next/navigation';
 export default function CertificationsPage() {
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isDark, setIsDark] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await api.getCertificates();
-      setCertificates(data.sort((a, b) => a.order - b.order));
+      try {
+        const data = await api.getCertificates();
+        setCertificates(data.sort((a, b) => a.order - b.order));
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -86,36 +91,57 @@ export default function CertificationsPage() {
             <div className="h-1 w-32 bg-green-500 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.5)] mt-6 md:mt-0"></div>
         </div>
 
-        {featured.length > 0 && (
-            <div className="mb-20">
-                <div className="flex items-center gap-4 mb-8">
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                        <Star className="text-green-500" fill="currentColor" /> Featured
-                    </h2>
-                    <div className="h-px flex-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {featured.map((cert, index) => (
-                        <CertificateCard key={cert.id} cert={cert} index={index} />
-                    ))}
-                </div>
-            </div>
-        )}
+        {isLoading ? (
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3, 4, 5, 6].map(i => (
+                    <div key={i} className="bg-zinc-900/40 border border-zinc-800 rounded-3xl overflow-hidden h-80 flex flex-col animate-pulse">
+                        <div className="h-48 bg-zinc-900 w-full"></div>
+                        <div className="p-6 flex-1 space-y-3">
+                            <div className="h-6 w-3/4 bg-zinc-900 rounded"></div>
+                            <div className="h-4 w-1/2 bg-zinc-900 rounded"></div>
+                            <div className="h-px bg-zinc-800 w-full my-4"></div>
+                            <div className="flex justify-between mt-auto">
+                                <div className="h-3 w-16 bg-zinc-900 rounded"></div>
+                                <div className="h-6 w-20 bg-zinc-900 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+             </div>
+        ) : (
+            <>
+                {featured.length > 0 && (
+                    <div className="mb-20">
+                        <div className="flex items-center gap-4 mb-8">
+                            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                                <Star className="text-green-500" fill="currentColor" /> Featured
+                            </h2>
+                            <div className="h-px flex-1 bg-gradient-to-r from-green-500/50 to-transparent"></div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {featured.map((cert, index) => (
+                                <CertificateCard key={cert.id} cert={cert} index={index} />
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-        {others.length > 0 && (
-            <div>
-                 <div className="flex items-center gap-4 mb-8">
-                    <h2 className="text-2xl font-bold text-zinc-300">
-                        {featured.length > 0 ? "Collection" : "All Certificates"}
-                    </h2>
-                    <div className="h-px flex-1 bg-zinc-800"></div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {others.map((cert, index) => (
-                        <CertificateCard key={cert.id} cert={cert} index={index} />
-                    ))}
-                </div>
-            </div>
+                {others.length > 0 && (
+                    <div>
+                         <div className="flex items-center gap-4 mb-8">
+                            <h2 className="text-2xl font-bold text-zinc-300">
+                                {featured.length > 0 ? "Collection" : "All Certificates"}
+                            </h2>
+                            <div className="h-px flex-1 bg-zinc-800"></div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {others.map((cert, index) => (
+                                <CertificateCard key={cert.id} cert={cert} index={index} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </>
         )}
       </main>
 

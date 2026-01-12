@@ -5,11 +5,12 @@ const ProjectSchema = new mongoose.Schema({
   description: { type: String, required: true },
   techStack: [{ type: String }],
   repoLink: { type: String },
+  backendRepo: { type: String },
   demoLink: { type: String },
   imageUrl: { type: String, required: true },
   category: { 
     type: String, 
-    enum: ['Featured', 'Personal', 'Mini'], 
+    enum: ['Featured', 'Personal', 'Mini', 'Ongoing'], 
     default: 'Personal' 
   },
   projectType: { type: String, default: 'Web App' },

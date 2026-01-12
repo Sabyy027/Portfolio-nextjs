@@ -16,6 +16,7 @@ export async function GET() {
         resumeLink: "https://sabeer-anwer-meeran-resume.tiiny.site/",
         githubLink: "https://github.com/Sabyy027",
         linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/",
+        profileImage: "/logo.jpeg",
         maintenanceMode: false
       });
     }
@@ -36,9 +37,9 @@ export async function POST(request: Request) {
       profile = await Profile.findByIdAndUpdate(
         profile._id, 
         body, 
-        { new: true, runValidators: true, strict: false }
+        { new: true, runValidators: true, strict: false, upsert: true }
       );
-      console.log('Profile updated:', profile);
+      console.log('Profile updated result:', profile);
     } else {
       profile = await Profile.create(body);
       console.log('Profile created:', profile);

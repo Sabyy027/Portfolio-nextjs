@@ -8,7 +8,8 @@ export enum SkillLevel {
 export enum ProjectCategory {
   Featured = 'Featured',
   Personal = 'Personal',
-  Mini = 'Mini'
+  Mini = 'Mini',
+  Ongoing = 'Ongoing'
 }
 
 export interface Project {
@@ -17,6 +18,7 @@ export interface Project {
   description: string;
   techStack: string[];
   repoLink?: string;
+  backendRepo?: string;
   demoLink?: string;
   imageUrl: string;
   category: ProjectCategory;
@@ -81,6 +83,7 @@ export interface UserProfile {
   resumeLink: string;
   githubLink?: string;
   linkedinLink?: string;
+  profileImage?: string;
   maintenanceMode?: boolean;
 }
 
@@ -92,5 +95,6 @@ export const INITIAL_PROFILE: UserProfile = {
   resumeLink: "https://sabeer-anwer-meeran-resume.tiiny.site/",
   githubLink: "https://github.com/Sabyy027",
   linkedinLink: "https://www.linkedin.com/in/sabeeranwermeeran/",
+  profileImage: "/logo.jpeg",
   maintenanceMode: false
 };

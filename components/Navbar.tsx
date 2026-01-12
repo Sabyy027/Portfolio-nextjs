@@ -12,7 +12,7 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const navItems = [
-    { name: 'About', href: '/#about', icon: Home },
+    { name: 'About', href: '/about', icon: Home },
     { name: 'Projects', href: '/projects', icon: Briefcase },
     { name: 'Journey', href: '/#journey', icon: MapPin },
     { name: 'Certificates', href: '/certifications', icon: Award }
@@ -22,6 +22,7 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
     const isHome = pathname === '/';
     if (item.name === 'Projects') return '/projects';
     if (item.name === 'Certificates') return '/certifications';
+    if (item.name === 'About') return '/about';
     return isHome ? item.href.split('#')[1] ? `#${item.href.split('#')[1]}` : '/' : item.href;
   };
 
@@ -37,7 +38,8 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
-              const isExternal = item.name === 'Projects' || item.name === 'Certificates';
+
+              const isExternal = item.name === 'Projects' || item.name === 'Certificates' || item.name === 'About';
               
               if (isExternal) {
                 return (
@@ -110,7 +112,9 @@ export const Navbar = ({ toggleTheme, isDark }: { toggleTheme: () => void, isDar
         <div className={`absolute top-16 right-4 left-4 bg-zinc-900 border border-white/10 rounded-2xl p-4 shadow-2xl transition-transform duration-300 ${mobileMenuOpen ? 'translate-y-0' : '-translate-y-4'}`}>
           <div className="flex flex-col gap-1">
             {navItems.map((item) => {
-              const isExternal = item.name === 'Projects' || item.name === 'Certificates';
+
+              
+              const isExternal = item.name === 'Projects' || item.name === 'Certificates' || item.name === 'About';
               const Icon = item.icon;
               
               if (isExternal) {

@@ -8,12 +8,17 @@ import { GraduationCap, Briefcase, Code, Award, Bookmark, Calendar, ChevronLeft,
 
 export const LearningCurve = () => {
   const [nodes, setNodes] = useState<LearningNode[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { 
     const fetchNodes = async () => {
+      try {
         const data = await api.getLearningCurve();
         setNodes(data.sort((a,b) => (a.order || 0) - (b.order || 0))); 
+      } finally {
+        setIsLoading(false);
+      }
     }
     fetchNodes();
   }, []);
@@ -143,9 +148,25 @@ export const LearningCurve = () => {
         
         {/* Mobile View: Vertical Timeline */}
         <div className="md:hidden mt-8 pl-2">
-           {nodes.map((node, index) => (
-              <NodeCard key={node.id} node={node} index={index} isVertical={true} />
-           ))}
+           {isLoading ? (
+             <div className="space-y-8 pl-8 border-l-2 border-zinc-800 pb-12">
+               {[1, 2, 3].map(i => (
+                 <div key={i} className="relative">
+                   <div className="absolute -left-[41px] top-0 w-4 h-4 rounded-full bg-zinc-900 border-2 border-zinc-800"></div>
+                   <div className="bg-zinc-900/40 p-5 rounded-2xl border border-white/5 animate-pulse space-y-3">
+                      <div className="h-4 w-20 bg-zinc-800 rounded"></div>
+                      <div className="h-3 w-32 bg-zinc-800 rounded"></div>
+                      <div className="h-6 w-3/4 bg-zinc-800 rounded"></div>
+                      <div className="h-16 w-full bg-zinc-800 rounded"></div>
+                   </div>
+                 </div>
+               ))}
+             </div>
+           ) : (
+             nodes.map((node, index) => (
+                <NodeCard key={node.id} node={node} index={index} isVertical={true} />
+             ))
+           )}
         </div>
 
         {/* Desktop View: Horizontal Scroll Timeline */}
@@ -156,14 +177,30 @@ export const LearningCurve = () => {
            {/* Scroll Track */}
            <div 
              ref={scrollContainerRef} 
-             className="flex overflow-x-auto gap-0 h-full hide-scrollbar snap-x px-8"
+             className="flex overflow-x-auto gap-0 h-full hide-scrollbar snap-x px-8 items-center"
              style={{ scrollBehavior: 'smooth' }}
            >
-              {nodes.map((node, index) => (
-                 <NodeCard key={node.id} node={node} index={index} isVertical={false} />
-              ))}
-              {/* Padding at end */}
-              <div className="min-w-[100px]"></div>
+              {isLoading ? (
+                // Desktop Skeletons
+                [1, 2, 3, 4].map((i) => (
+                  <div key={i} className="min-w-[400px] px-4 relative h-full flex items-center">
+                     <div className={`w-full p-6 rounded-2xl border border-white/5 bg-zinc-900/20 animate-pulse space-y-4 ${i % 2 === 0 ? 'mb-32' : 'mt-32'}`}>
+                        <div className="h-4 w-20 bg-zinc-800 rounded"></div>
+                        <div className="h-6 w-3/4 bg-zinc-800 rounded"></div>
+                        <div className="h-3 w-1/2 bg-zinc-800 rounded"></div>
+                        <div className="h-20 w-full bg-zinc-800 rounded"></div>
+                     </div>
+                  </div>
+                ))
+              ) : (
+                <>
+                  {nodes.map((node, index) => (
+                     <NodeCard key={node.id} node={node} index={index} isVertical={false} />
+                  ))}
+                  {/* Padding at end */}
+                  <div className="min-w-[100px]"></div>
+                </>
+              )}
            </div>
            
            {/* Gradient Masks for Scroll Hint */}

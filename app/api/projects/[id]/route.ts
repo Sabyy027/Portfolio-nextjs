@@ -15,6 +15,7 @@ export async function PUT(
     const project = await Project.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
+      strict: false // Allow new fields to be saved even if schema was cached
     });
     if (!project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     return NextResponse.json(project);

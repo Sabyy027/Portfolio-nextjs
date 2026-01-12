@@ -357,6 +357,11 @@ export default function AdminPage() {
                    <input value={profile.linkedinLink} onChange={e => setProfile({...profile, linkedinLink: e.target.value})} className="w-full bg-zinc-950 border border-white/10 rounded-full px-4 py-2" />
                 </div>
               </div>
+
+              <div className="space-y-2">
+                 <label className="text-xs font-mono text-zinc-500 uppercase">Profile Image URL (e.g. /logo.jpeg or https://...)</label>
+                 <input value={profile.profileImage || ''} onChange={e => setProfile({...profile, profileImage: e.target.value})} className="w-full bg-zinc-950 border border-white/10 rounded-full px-4 py-2" />
+              </div>
               
               <Button type="submit" className="w-full">Save Profile Changes</Button>
             </form>
@@ -420,7 +425,8 @@ export default function AdminPage() {
                  <input placeholder="Key Features (comma sep)" value={editingProject.features?.join(', ') || ''} onChange={e => setEditingProject({...editingProject, features: e.target.value.split(',').map(s=>s.trim())})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                  
                  <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="GitHub Repo Link (Optional)" value={editingProject.repoLink || ''} onChange={e => setEditingProject({...editingProject, repoLink: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
+                    <input placeholder="Frontend Repo Link (Optional)" value={editingProject.repoLink || ''} onChange={e => setEditingProject({...editingProject, repoLink: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
+                    <input placeholder="Backend Repo Link (Optional)" value={editingProject.backendRepo || ''} onChange={e => setEditingProject({...editingProject, backendRepo: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                     <input placeholder="Live Demo Link (Optional)" value={editingProject.demoLink || ''} onChange={e => setEditingProject({...editingProject, demoLink: e.target.value})} className="bg-zinc-950 border border-white/10 p-3 rounded-lg" />
                  </div>
                  <input placeholder="Image URL" value={editingProject.imageUrl} onChange={e => setEditingProject({...editingProject, imageUrl: e.target.value})} className="w-full bg-zinc-950 border border-white/10 p-3 rounded-lg" required />
@@ -431,6 +437,7 @@ export default function AdminPage() {
                       <option value="Featured">Featured</option>
                       <option value="Personal">Personal</option>
                       <option value="Mini">Mini</option>
+                      <option value="Ongoing">Ongoing</option>
                     </select>
                  </div>
                  
