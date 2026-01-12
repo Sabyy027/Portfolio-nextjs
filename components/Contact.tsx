@@ -192,21 +192,7 @@ export const Contact = ({ profile }: { profile: UserProfile }) => {
                </div>
                <div>
                  <label htmlFor="subject" className="block text-xs font-medium text-zinc-500 mb-2 uppercase tracking-wider">Subject</label>
-                 <div className="relative">
-                   <select 
-                      id="subject"
-                      name="subject"
-                      className="w-full appearance-none bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-3.5 text-zinc-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 transition-all text-zinc-400"
-                    >
-                     <option>General Inquiry</option>
-                     <option>Project Proposal</option>
-                     <option>Recruitment</option>
-                     <option>Other</option>
-                   </select>
-                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-600">
-                     <ArrowUpRight size={16} className="rotate-45" />
-                   </div>
-                 </div>
+                   <CustomDropdown />
                </div>
                <div>
                  <label htmlFor="message" className="block text-xs font-medium text-zinc-500 mb-2 uppercase tracking-wider">Message</label>
